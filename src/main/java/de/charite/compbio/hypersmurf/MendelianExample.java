@@ -4,10 +4,7 @@
 package de.charite.compbio.hypersmurf;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.time.Duration;
-import java.time.temporal.TemporalAmount;
-import java.util.Date;
 
 import weka.classifiers.AbstractClassifier;
 import weka.classifiers.Classifier;
@@ -20,6 +17,15 @@ import weka.filters.Filter;
 import weka.filters.supervised.attribute.AddClassification;
 import weka.filters.unsupervised.instance.SubsetByExpression;
 
+/**
+ * Mendelian Example
+ * 
+ * This class loads mendelian balanced and imbalanced datasets (arff file). And
+ * then runs different configured hyperSMURF classifiers on it using a 10-fold
+ * cytogenetic band-aware cross-validation. See {@link #main(String[])} how you
+ * use the command-line to set the different datasets.
+ *
+ */
 public class MendelianExample {
 
 	/**
@@ -32,6 +38,17 @@ public class MendelianExample {
 	 */
 	private static int FOLDS = 10;
 
+	/**
+	 * Main method. Use {@code arg[0]} for data
+	 * {@code Mendelian.balanced.arff.gz}, {@code arg[1]} for data
+	 * {@code Mendelian.1_10.arff.gz}, {@code arg[2]} for data
+	 * {@code Mendelian.1_100.arff.gz}, and {@code arg[3]} for data
+	 * {@code Mendelian.1_1000.arff.gz}.
+	 * 
+	 * @param args
+	 *            Four different paths to the different Mendelian datasets.
+	 * @throws Exception
+	 */
 	public static void main(String[] args) throws Exception {
 
 		// read the file from the first argument of the command line input
@@ -96,16 +113,27 @@ public class MendelianExample {
 
 		// show the running time
 		long startTime = System.nanoTime();
-		
+
 		classify(clsHyperSMURF, instances);
-		
+
 		long endTime = System.nanoTime();
 		long duration = (endTime - startTime);
-		
+
 		System.out.println("Running time: " + Duration.ofNanos(duration).getSeconds() + " seconds!");
 
 	}
 
+	/**
+	 * This methods uses an 10-fold CV (folds specified by the fold attribute)
+	 * with the given classifier on the given instances and print out the
+	 * performance to the console.
+	 * 
+	 * @param cls
+	 *            The classifier for training.
+	 * @param instances
+	 *            Instances to train on.
+	 * @throws Exception
+	 */
 	private static void classify(AbstractClassifier cls, Instances instances) throws Exception {
 		// perform cross-validation and add predictions
 		Instances predictedData = null;
@@ -153,8 +181,15 @@ public class MendelianExample {
 
 	/**
 	 * @param instances
+	 *            The instances to use the method on. Must contain a attribute
+	 *            named with fold which must be numerical.
 	 * @param fold
+	 *            The fold of interest (given by the fold attribute in the
+	 *            instances)
 	 * @param invert
+	 *            if {@code true} the given fold will be selected. If
+	 *            {@code false} All instances not of the given fold will be
+	 *            selected
 	 * @return
 	 * @throws Exception
 	 */
